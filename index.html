@@ -181,7 +181,7 @@
                 // This function populates the views with their initial HTML structure
                 getEl('view-tasks').innerHTML = `<div class="app-layout"><div class="layout-column"><h2>Daily Tasks</h2><ul id="daily-tasks-list" class="task-list"></ul></div><div class="layout-column"><h2>Weekly Tasks <span id="weekly-reset-counter" class="streak-counter"></span></h2><ul id="weekly-tasks-list" class="task-list"></ul></div></div>`;
                 getEl('view-primos').innerHTML = `<div class="single-column-view" style="max-width: 500px; margin: auto;"><h2>Primogem Stats</h2><div class="stats"><div class="stat-item"><h3>DAILY STREAK</h3><p id="daily-streak">0</p></div><div class="stat-item"><h3>PRIMOGEMS</h3><p><span id="primo-count">0</span> / <span id="primo-goal">16000</span></p></div></div><div class="controls-group"><button id="add-primo-btn" class="btn btn-primary">Add Primogems</button><button id="set-goal-btn" class="btn btn-primary">Set Primogem Goal</button></div></div>`;
-                getEl('view-gacha').innerHTML = `<div class="single-column-view"><h2 style="text-align:center;">Gacha Log Analyzer</h2><details class="instructions-container"><summary>► How to Get Your Wish URL</summary><div class="instructions-content" style="padding:0 15px 15px 15px;"><ol style="padding-left:20px;margin:0;line-height:1.6;"><li>Open Genshin Impact on your PC.</li><li>Open the Wish History in the game and wait for it to fully load.</li><li>Press the START key, search for "PowerShell", and open it.</li><li>Copy & paste the script below into PowerShell:</li></ol><div class="code-block-wrapper"><pre id="powershell-script"></pre><button id="copy-script-btn" class="btn btn-primary">Copy</button></div><ol start="5" style="padding-left:20px;margin-top:10px;line-height:1.6;"><li>Press ENTER. The link will be copied to your clipboard.</li><li>Click the button below and paste the link.</li></ol></div></details><div class="controls-group" style="max-width: 400px; margin: 0 auto 20px auto;"><button id="import-gacha-btn" class="btn btn-action">Import Gacha Log</button></div><div id="gacha-stats-container"></div></div>`;
+                getEl('view-gacha').innerHTML = `<div class="single-column-view"><h2 style="text-align:center;">Gacha Log Analyzer</h2><div style="text-align: center; margin-bottom: 20px;"><p style="margin: 5px 0;">The easiest way: Go to <a href="https://paimon.moe/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-light-blue);">paimon.moe</a>, open Settings, click "Export & Import Data", then click "Download Data" to get the JSON file.</p></div><div class="controls-group" style="max-width: 500px; margin: 0 auto 20px auto; flex-direction: row; justify-content: center; gap: 15px;"><button id="import-paimon-btn" class="btn btn-action">Import Paimon.moe JSON File</button></div> <input type="file" id="paimon-file-input" accept=".json" style="display: none;"><details class="instructions-container"><summary>► (Alternate) Get Wish URL from Game</summary><div class="instructions-content" style="padding:0 15px 15px 15px;"><ol style="padding-left:20px;margin:0;line-height:1.6;"><li>Open Genshin Impact on your PC.</li><li>Open the Wish History in the game and wait for it to fully load.</li><li>Press the START key, search for "PowerShell", and open it.</li><li>Copy & paste the script below into PowerShell:</li></ol><div class="code-block-wrapper"><pre id="powershell-script"></pre><button id="copy-script-btn" class="btn btn-primary">Copy</button></div><ol start="5" style="padding-left:20px;margin-top:10px;line-height:1.6;"><li>Press ENTER. The link will be copied to your clipboard.</li><li>Click the button below and paste the link.</li></ol><div class="controls-group" style="max-width: 400px; margin: 15px auto 0 auto;"><button id="import-url-btn" class="btn btn-action">Import Gacha Log from URL</button></div></div></details><div id="gacha-stats-container"></div></div>`;
                 getEl('view-calendar').innerHTML = `<div class="single-column-view"><div class="calendar-header"><h2>Yearly Wish Calendar</h2><div class="year-selector"><button id="prev-year-btn" class="btn btn-secondary">&lt;</button><span id="current-year-display"></span><button id="next-year-btn" class="btn btn-secondary">&gt;</button></div></div><div id="calendar-grid" class="calendar-grid"></div></div>`;
                 getEl('view-settings').innerHTML = `<div class="single-column-view" style="max-width: 500px; margin: auto;"><h2>Settings & Resets</h2><div class="controls-group"><button id="manual-reset-btn" class="btn btn-secondary">Perform Daily Task Reset</button><button id="reset-all-btn" class="btn btn-clear">Clear & Reset All Data</button></div></div>`;
                 getEl('custom-modal').innerHTML = `<div class="modal-content"><h3 id="modal-title"></h3><p id="modal-message"></p><div id="modal-custom-content"></div><input type="text" id="modal-input" class="modal-input" style="display: none;"><div class="modal-buttons"><button id="modal-cancel-btn" class="btn btn-secondary">Cancel</button><button id="modal-confirm-btn" class="btn btn-primary">Confirm</button></div></div>`;
@@ -192,6 +192,8 @@
             let state;
             const STORAGE_KEY = 'genshinTrackerData_v2_stable';
             const STANDARD_5_STARS = ['Keqing', 'Mona', 'Qiqi', 'Diluc', 'Jean', 'Dehya', 'Tighnari'];
+            
+            let rarityMap = null;
 
             function showView(viewId) {
                 const animationDuration = 300;
@@ -312,7 +314,7 @@
                 const modal = getEl('custom-modal'), modalTitle = getEl('modal-title'), modalMessage = getEl('modal-message'), modalInput = getEl('modal-input'), modalCustom = getEl('modal-custom-content'), modalCancelBtn = getEl('modal-cancel-btn'), modalConfirmBtn = getEl('modal-confirm-btn');
                 return new Promise((resolve) => {
                     modalTitle.textContent = options.title;
-                    modalMessage.style.display = options.message ? 'block' : 'none'; modalMessage.textContent = options.message || '';
+                    modalMessage.style.display = options.message ? 'block' : 'none'; modalMessage.innerHTML = options.message || '';
                     modalInput.style.display = options.type === 'prompt' ? 'block' : 'none';
                     modalInput.value = options.defaultValue || ''; modalInput.placeholder = options.placeholder || '';
                     modalCancelBtn.style.display = options.type === 'alert' || options.customHtml ? 'none' : 'flex';
@@ -391,16 +393,45 @@
             }
             const checkForAutomaticResets = async () => { if (new Date().toDateString() !== new Date(state.lastDailyReset).toDateString()) await performDailyReset(true); };
             
-            async function handleGachaImport(url) {
-                getEl('gacha-stats-container').innerHTML = `<p style="text-align:center; padding: 20px;">Importing... this may take a moment.</p>`;
-                const CORS_PROXY = 'https://corsproxy.io/?';
-                const bannerTypes = [{ id: '301', name: 'Character Event' }, { id: '302', name: 'Weapon Event' }, { id: '200', name: 'Standard' }, { id: '100', name: 'Novice'}];
+            async function processAndMergeWishes(newWishes) {
+                if (!newWishes || newWishes.length === 0) {
+                    await showModal({type:'alert', title:'Import Info', message: 'No new wishes found in the provided data.', confirmText:'OK'});
+                    renderAll();
+                    return;
+                }
+                
+                getEl('gacha-stats-container').innerHTML = `<p style="text-align:center; padding: 20px;">Merging data... this may take a moment.</p>`;
+
                 let allWishes = state.gachaLog?.wishes || [];
                 const existingWishIds = new Set(allWishes.map(w => w.id));
+                let addedCount = 0;
+
+                for (const wish of newWishes) {
+                    if (wish.id && !existingWishIds.has(wish.id)) {
+                        allWishes.push(wish);
+                        addedCount++;
+                    }
+                }
+                
+                allWishes.sort((a, b) => new Date(b.time) - new Date(a.time));
+                state.gachaLog = { wishes: allWishes, lastImport: new Date().toISOString() };
+                state.calendarDisplayYear = new Date().getFullYear();
+                saveState();
+                renderAll();
+                await showModal({type:'alert', title:'Import Complete', message: `Successfully merged data. Added ${addedCount} new wishes.`, confirmText:'OK'});
+            }
+
+            async function handleGachaImportFromURL(url) {
+                getEl('gacha-stats-container').innerHTML = `<p style="text-align:center; padding: 20px;">Importing from URL... this may take a moment.</p>`;
+                const CORS_PROXY = 'https://corsproxy.io/?';
+                const bannerTypes = [{ id: '301', name: 'Character Event' }, { id: '302', name: 'Weapon Event' }, { id: '200', name: 'Standard' }, { id: '100', name: 'Novice'}];
+                let fetchedWishes = [];
                 try {
                     const urlObj = new URL(url);
                     const baseUrl = `${urlObj.protocol}//${urlObj.host}${urlObj.pathname}`;
                     const baseParams = new URLSearchParams(urlObj.search);
+                    const existingWishIds = new Set((state.gachaLog?.wishes || []).map(w => w.id));
+
                     for (const banner of bannerTypes) {
                         let endId = '0', page = 1, foundExistingWish = false;
                         while (!foundExistingWish) {
@@ -413,16 +444,102 @@
                             if (data.retcode !== 0) break;
                             const newWishes = data.data?.list || [];
                             if (newWishes.length === 0) break;
-                            for (const wish of newWishes) { if (existingWishIds.has(wish.id)) { foundExistingWish = true; } else { allWishes.push(wish); } }
+                            for (const wish of newWishes) { if (existingWishIds.has(wish.id)) { foundExistingWish = true; } else { fetchedWishes.push(wish); } }
                             endId = newWishes[newWishes.length - 1].id; page++;
                             await new Promise(resolve => setTimeout(resolve, 300));
                         }
                     }
-                    const uniqueWishes = Array.from(new Map(allWishes.map(w => [w.id, w])).values());
-                    uniqueWishes.sort((a, b) => new Date(b.time) - new Date(a.time));
-                    state.gachaLog = { wishes: uniqueWishes, lastImport: new Date().toISOString() };
-                    saveState(); renderAll();
+                    await processAndMergeWishes(fetchedWishes);
                 } catch (error) { await showModal({type:'alert', title:'Import Failed', message: error.message, confirmText:'OK'}); renderAll(); }
+            }
+            
+            async function handlePaimonFileSelect(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                getEl('gacha-stats-container').innerHTML = `<p style="text-align:center; padding: 20px;">Reading file...</p>`;
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const paimonData = JSON.parse(e.target.result);
+                        
+                        // UIGF format (has rarity info)
+                        if (paimonData && paimonData.info && Array.isArray(paimonData.list)) {
+                            await processAndMergeWishes(paimonData.list);
+                        } 
+                        // Paimon.moe local backup format (no rarity info)
+                        else if (paimonData && paimonData['wish-counter-character-event']) {
+                            const convertedWishes = await convertLocalDataToUIGF(paimonData);
+                            await processAndMergeWishes(convertedWishes);
+                        }
+                        else {
+                            throw new Error('Invalid or unrecognized file format. Please make sure you are using a JSON file from Paimon.moe.');
+                        }
+
+                    } catch (error) {
+                        await showModal({ type:'alert', title:'Import Failed', message: `${error.message}`, confirmText:'OK'});
+                        renderAll();
+                    } finally {
+                        event.target.value = '';
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            function convertPaimonIdToName(id) {
+                return id.replace(/_/g, ' ').replace(/\b\w/g, char => char.toUpperCase());
+            }
+
+            async function createRarityMap() {
+                if (rarityMap) return rarityMap;
+
+                try {
+                    const response = await fetch('database.json');
+                    if (!response.ok) throw new Error('Network response was not ok.');
+                    const data = await response.json();
+                    
+                    rarityMap = {};
+                    data.fiveStar.forEach(item => rarityMap[item] = '5');
+                    data.fourStar.forEach(item => rarityMap[item] = '4');
+                    return rarityMap;
+                } catch (error) {
+                    console.error('Failed to fetch rarity database:', error);
+                    // Return an empty map as a fallback so the app doesn't crash
+                    return {};
+                }
+            }
+            
+            async function convertLocalDataToUIGF(localData) {
+                const map = await createRarityMap();
+                const convertedWishes = [];
+                const bannerKeys = {
+                    'wish-counter-beginners': '100', 'wish-counter-character-event': '301',
+                    'wish-counter-weapon-event': '302', 'wish-counter-standard': '200',
+                    'wish-counter-chronicled': '500'
+                };
+
+                for (const key in bannerKeys) {
+                    if (localData[key] && Array.isArray(localData[key].pulls)) {
+                        localData[key].pulls.forEach((pull, index) => {
+                            const name = convertPaimonIdToName(pull.id);
+                            let rank_type = map[name];
+                            
+                            if (!rank_type) {
+                                if (pull.pity > 10) rank_type = '5';
+                                else if (pull.pity > 1) rank_type = '4';
+                                else rank_type = '3';
+                            }
+                            
+                            const uniqueifier = `${pull.time}-${name}-${pull.pity}-${index}`;
+                            const newWish = {
+                                name: name, time: pull.time, gacha_type: pull.code || bannerKeys[key], 
+                                rank_type: rank_type, id: uniqueifier 
+                            };
+                            convertedWishes.push(newWish);
+                        });
+                    }
+                }
+                return convertedWishes;
             }
 
             function bindEventListeners() {
@@ -440,14 +557,14 @@
                 getEl('add-primo-btn').addEventListener('click', async () => { const v = await showModal({type:'prompt', title:'Add Primogems', placeholder:'e.g., 300'}); if(v){state.primogemCount+=parseInt(v,10)||0; saveState(); renderPrimos();} });
                 getEl('set-goal-btn').addEventListener('click', async () => { const v = await showModal({type:'prompt', title:'Set Goal', placeholder: 'e.g., 28800'}); if(v){state.primogemGoal=parseInt(v,10)||16000; saveState(); renderPrimos();} });
                 
-                getEl('import-gacha-btn').addEventListener('click', async () => { 
-                    const url = await showModal({type:'prompt', title:'Import Gacha Log', message: 'Please paste your full gacha log URL.', placeholder:'https://...'}); 
-                    if(url){
-                        state.calendarDisplayYear = new Date().getFullYear(); 
-                        await handleGachaImport(url);
-                    } 
+                getEl('import-url-btn').addEventListener('click', async () => { 
+                    const url = await showModal({type:'prompt', title:'Import Gacha Log from URL', message: 'Please paste your full gacha log URL.', placeholder:'https://...'}); 
+                    if(url) await handleGachaImportFromURL(url);
                 });
                 
+                getEl('import-paimon-btn').addEventListener('click', () => getEl('paimon-file-input').click());
+                getEl('paimon-file-input').addEventListener('change', handlePaimonFileSelect);
+
                 getEl('manual-reset-btn').addEventListener('click', () => performDailyReset(false));
                 getEl('reset-all-btn').addEventListener('click', async () => { if(await showModal({title:'Confirm Total Reset', message:'This will delete all saved data. This cannot be undone.', type:'confirm'})){localStorage.removeItem(STORAGE_KEY); location.reload();} });
                 
