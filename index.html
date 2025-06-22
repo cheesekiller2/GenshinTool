@@ -38,6 +38,7 @@
             display: flex; justify-content: space-between; align-items: center; 
             border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px;
             width: 100%; max-width: 1200px; margin-left: auto; margin-right: auto;
+            transition: opacity 0.3s ease;
         }
         h1 { color: var(--primary-text); font-size: 2.5em; margin: 0; }
         #live-clock { font-size: 1.5em; color: var(--secondary-text); font-weight: bold; }
@@ -65,30 +66,90 @@
             background-color: var(--card-color); border: 2px solid var(--border-color);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             cursor: pointer; transition: transform 0.2s ease, border-color 0.2s ease;
+            /* <<< MODIFIED: Using margins for centering instead of transform */
+            margin-left: -60px;
+            margin-top: -60px;
         }
-        .menu-button:hover { transform: translate(-50%, -50%) scale(1.15); border-color: var(--accent-blue); }
+        /* <<< MODIFIED: Hover transform is now just scale */
+        .menu-button:hover { 
+            transform: scale(1.15); 
+            border-color: var(--accent-blue); 
+        }
         .menu-button:hover .tooltip { opacity: 1; }
         .menu-button svg { width: 50px; height: 50px; fill: var(--secondary-text); transition: fill 0.2s ease; }
         .menu-button:hover svg { fill: var(--primary-text); }
-        #menu-btn-tasks { top: 10%; left: 50%; transform: translate(-50%, -50%); }
-        #menu-btn-primos { top: 45%; left: 95%; transform: translate(-50%, -50%); }
-        #menu-btn-gacha { top: 90%; left: 75%; transform: translate(-50%, -50%); }
-        #menu-btn-calendar { top: 90%; left: 25%; transform: translate(-50%, -50%); }
-        #menu-btn-settings { top: 45%; left: 5%; transform: translate(-50%, -50%); }
+        /* <<< MODIFIED: Removed transform from all positioning rules */
+        #menu-btn-tasks { top: 10%; left: 50%; }
+        #menu-btn-primos { top: 45%; left: 95%; }
+        #menu-btn-gacha { top: 90%; left: 75%; }
+        #menu-btn-calendar { top: 90%; left: 25%; }
+        #menu-btn-map { top: 45%; left: 5%; }
+
+        #menu-btn-settings {
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            width: 60px;
+            height: 60px;
+            background-color: var(--card-color);
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            display: none; 
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1001;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+        #menu-btn-settings:hover {
+            transform: scale(1.15);
+            border-color: var(--accent-blue);
+        }
+        #menu-btn-settings svg {
+            width: 30px;
+            height: 30px;
+            fill: var(--secondary-text);
+            transition: fill 0.2s ease;
+        }
+        #menu-btn-settings:hover svg {
+            fill: var(--primary-text);
+        }
         
         .tooltip { position: absolute; bottom: -35px; left: 50%; transform: translateX(-50%); background-color: var(--bg-color); color: var(--primary-text); padding: 5px 10px; border-radius: 4px; font-size: 0.9em; opacity: 0; transition: opacity 0.2s ease; pointer-events: none; white-space: nowrap; }
 
+        #back-button-hotspot {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            z-index: 1002;
+            display: none;
+        }
         .btn-back-icon {
-            position: fixed; top: 25px; right: 25px;
+            position: absolute; 
+            top: 25px; right: 25px;
             width: 44px; height: 44px;
             background: var(--card-color); border: 1px solid var(--border-color);
             padding: 10px; cursor: pointer; border-radius: 50%;
-            transition: background-color 0.2s ease, transform 0.2s ease;
-            z-index: 1001; display: none;
+            transition: background-color 0.2s ease, transform 0.2s ease, opacity 0.3s ease;
         }
+        #back-button-hotspot.visible { display: block; }
         .btn-back-icon:hover { background-color: var(--border-color); transform: scale(1.1); }
         .btn-back-icon svg { width: 24px; height: 24px; fill: var(--secondary-text); display: block; }
-        .btn-back-icon.visible { display: block; }
+
+        body.map-is-active main { padding: 0; }
+        body.map-is-active #back-button-hotspot .btn-back-icon { opacity: 0; }
+        body.map-is-active #back-button-hotspot:hover .btn-back-icon { opacity: 1; }
+        #view-map.active {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            max-width: none;
+            padding: 0;
+            background-color: var(--bg-color);
+        }
+        #interactive-map-iframe { width: 100%; height: 100%; border: none; }
 
         .app-layout { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; }
         .layout-column, .single-column-view { background-color: var(--card-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 25px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
@@ -105,6 +166,9 @@
         .btn-clear:hover { background-color: #c9302c; }
 
         .controls-group { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .settings-section { border-top: 1px solid var(--border-color); margin-top: 20px; padding-top: 20px; }
+        .settings-section h3 { margin-top: 0; text-align: center; }
+
         .stats { text-align: center; margin-bottom: 25px; padding: 15px; background-color: rgba(0,0,0,0.2); border-radius: 6px; }
         .stat-item p { margin: 0; font-size: 1.8em; font-weight: bold; }
         
@@ -159,7 +223,10 @@
         .pity-value.pity-mid { color: var(--primary-text); }
 
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .calendar-controls { display: flex; align-items: center; gap: 15px; }
+        .year-selector { display: flex; align-items: center; gap: 5px; }
         .calendar-header button { padding: 5px 12px; font-size: 1em; }
+        #current-year-display { font-size: 1.2em; padding: 0 5px; }
         .calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         .month { background-color: var(--bg-color); padding: 15px; border-radius: 6px; }
         .day-headers, .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
@@ -185,27 +252,36 @@
 </head>
 <body>
     <div class="header-section"><h1>Genshin Tool</h1><div id="live-clock">--:--:--</div></div>
-    <button class="btn-back-icon" id="btn-back-main" title="Back to Menu"><svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg></button>
+    <div id="back-button-hotspot">
+        <button class="btn-back-icon" id="btn-back-main" title="Back to Menu"><svg viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" /></svg></button>
+    </div>
     <main>
-        <div id="main-menu" class="view active">
-             <div id="menu-btn-tasks" class="menu-button" data-view="view-tasks"><svg viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M8.5,13.5L10.5,15.5L15,11L16.5,12.5L10.5,18.5L7,15L8.5,13.5Z" /></svg><span class="tooltip">Tasks</span></div>
+        <div id="main-menu" class="view">
+            <div id="menu-btn-tasks" class="menu-button" data-view="view-tasks"><svg viewBox="0 0 24 24"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M8.5,13.5L10.5,15.5L15,11L16.5,12.5L10.5,18.5L7,15L8.5,13.5Z" /></svg><span class="tooltip">Tasks</span></div>
             <div id="menu-btn-primos" class="menu-button" data-view="view-primos"><svg viewBox="0 0 24 24"><path d="M12,1L9,9L1,12L9,15L12,23L15,15L23,12L15,9L12,1Z" /></svg><span class="tooltip">Primogems</span></div>
+            <div id="menu-btn-map" class="menu-button" data-view="view-map">
+                <svg viewBox="0 0 24 24"><path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"/></svg>
+                <span class="tooltip">Interactive Map</span>
+            </div>
             <div id="menu-btn-gacha" class="menu-button" data-view="view-gacha"><svg viewBox="0 0 24 24"><path d="M12,17.27L18.18,21L17,14.63L22,9.72L15.45,8.81L12,2.5L8.55,8.81L2,9.72L7,14.63L5.82,21L12,17.27Z" /></svg><span class="tooltip">Gacha Log</span></div>
             <div id="menu-btn-calendar" class="menu-button" data-view="view-calendar"><svg viewBox="0 0 24 24"><path d="M19,19H5V8H19M19,3H18V1H16V3H8V1H6V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M16.5,12H12.5V17H16.5V12Z" /></svg><span class="tooltip">Calendar</span></div>
-            <div id="menu-btn-settings" class="menu-button" data-view="view-settings"><svg viewBox="0 0 24 24"><path d="M19.43,12.98C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.98L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.98M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5Z" /></svg><span class="tooltip">Settings</span></div>
         </div>
+        <div id="view-map" class="view"></div>
         <div id="view-tasks" class="view"></div><div id="view-primos" class="view"></div><div id="view-gacha" class="view"></div><div id="view-calendar" class="view"></div><div id="view-settings" class="view"></div>
     </main>
+    <div id="menu-btn-settings" data-view="view-settings">
+        <svg viewBox="0 0 24 24"><path d="M19.43,12.98C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.98L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.98M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5Z" /></svg>
+    </div>
     <div id="custom-modal" class="modal-overlay"></div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             function setViewHTML() {
-                // This function populates the views with their initial HTML structure
                 getEl('view-tasks').innerHTML = `<div class="app-layout"><div class="layout-column"><h2>Daily Tasks</h2><ul id="daily-tasks-list" class="task-list"></ul></div><div class="layout-column"><h2>Weekly Tasks <span id="weekly-reset-counter" class="streak-counter"></span></h2><ul id="weekly-tasks-list" class="task-list"></ul></div></div>`;
                 getEl('view-primos').innerHTML = `<div class="single-column-view" style="max-width: 500px; margin: auto;"><h2>Primogem Stats</h2><div class="stats"><div class="stat-item"><h3>DAILY STREAK</h3><p id="daily-streak">0</p></div><div class="stat-item"><h3>PRIMOGEMS</h3><p><span id="primo-count">0</span> / <span id="primo-goal">16000</span></p></div></div><div class="controls-group"><button id="add-primo-btn" class="btn btn-primary">Add Primogems</button><button id="set-goal-btn" class="btn btn-primary">Set Primogem Goal</button></div></div>`;
+                getEl('view-map').innerHTML = `<iframe id="interactive-map-iframe" src="https://genshin-impact-map.appsample.com/?map=teyvat"></iframe>`;
                 getEl('view-gacha').innerHTML = `<div class="single-column-view"><h2 style="text-align:center;">Gacha Log Analyzer</h2><details class="instructions-container"><summary>► How to Get Your Wish URL</summary><div class="instructions-content" style="padding:0 15px 15px 15px;"><ol style="padding-left:20px;margin:0;line-height:1.6;"><li>Open Genshin Impact on your PC.</li><li>Open the Wish History in the game and wait for it to fully load.</li><li>Press the START key, search for "PowerShell", and open it.</li><li>Copy & paste the script below into PowerShell:</li></ol><div class="code-block-wrapper"><pre id="powershell-script"></pre><button id="copy-script-btn" class="btn btn-primary">Copy</button></div><ol start="5" style="padding-left:20px;margin-top:10px;line-height:1.6;"><li>Press ENTER. The link will be copied to your clipboard.</li><li>Click the button below and paste the link.</li></ol></div></details><div class="controls-group" style="max-width: 400px; margin: 0 auto 20px auto;"><button id="import-gacha-btn" class="btn btn-action">Import Gacha Log</button></div><div id="gacha-stats-container"></div></div>`;
-                getEl('view-calendar').innerHTML = `<div class="single-column-view"><div class="calendar-header"><h2>Yearly Wish Calendar</h2><div class="year-selector"><button id="prev-year-btn" class="btn btn-secondary">&lt;</button><span id="current-year-display"></span><button id="next-year-btn" class="btn btn-secondary">&gt;</button></div></div><div id="calendar-grid" class="calendar-grid"></div></div>`;
-                getEl('view-settings').innerHTML = `<div class="single-column-view" style="max-width: 500px; margin: auto;"><h2>Settings & Resets</h2><div class="controls-group"><button id="manual-reset-btn" class="btn btn-secondary">Perform Daily Task Reset</button><button id="reset-primo-btn" class="btn btn-secondary">Reset Primogem Count</button><button id="reset-all-btn" class="btn btn-clear">Clear & Reset All Data</button></div></div>`;
+                getEl('view-calendar').innerHTML = `<div class="single-column-view"><div class="calendar-header"><div class="calendar-controls"><h2>Yearly Wish Calendar</h2></div><div class="year-selector"><button id="prev-year-btn" class="btn btn-secondary">&lt;</button><span id="current-year-display"></span><button id="next-year-btn" class="btn btn-secondary">&gt;</button></div></div><div id="calendar-grid" class="calendar-grid"></div></div>`;
+                getEl('view-settings').innerHTML = `<div class="single-column-view" style="max-width: 500px; margin: auto;"><h2>Settings</h2><div class="settings-section"><h3>General Resets</h3><div class="controls-group" style="margin-top:0;"><button id="manual-reset-btn" class="btn btn-secondary">Perform Daily Task Reset</button><button id="reset-primo-btn" class="btn btn-secondary">Reset Primogem Count</button></div></div><div class="settings-section"><h3>Date Override</h3><p id="custom-date-display" style="text-align:center; color: var(--secondary-text); margin-bottom: 10px;"></p><div class="controls-group" style="margin-top:0;"><button id="set-date-btn" class="btn btn-secondary">Set Custom Date</button><button id="sync-date-btn" class="btn btn-secondary">Sync to Today</button></div></div><div class="settings-section"><h3>Danger Zone</h3><div class="controls-group" style="margin-top:0;"><button id="reset-all-btn" class="btn btn-clear">Clear & Reset All Data</button></div></div></div>`;
                 getEl('custom-modal').innerHTML = `<div class="modal-content"><h3 id="modal-title"></h3><p id="modal-message"></p><div id="modal-custom-content"></div><input type="text" id="modal-input" class="modal-input" style="display: none;"><div class="modal-buttons"><button id="modal-cancel-btn" class="btn btn-secondary">Cancel</button><button id="modal-confirm-btn" class="btn btn-primary">Confirm</button></div></div>`;
                 getEl('powershell-script').textContent = `Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex "&{$((New-Object System.Net.WebClient).DownloadString('https://gist.github.com/MadeBaruna/1d75c1d37d19eca71591ec8a31178235/raw/getlink.ps1'))} global"`;
             }
@@ -214,12 +290,34 @@
             let state;
             const STORAGE_KEY = 'genshinTrackerData_v2_stable';
             const STANDARD_5_STARS = ['Keqing', 'Mona', 'Qiqi', 'Diluc', 'Jean', 'Dehya', 'Tighnari'];
+            
+            const getAppDate = () => state.customDate ? new Date(state.customDate + 'T12:00:00') : new Date();
+            
+            const toLocalISOString = (date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
 
             function showView(viewId) {
                 const animationDuration = 300;
                 const activeView = document.querySelector('.view.active');
-                const backButton = getEl('btn-back-main');
+                const backButtonHotspot = getEl('back-button-hotspot');
+                const header = document.querySelector('.header-section');
+                const settingsBtn = getEl('menu-btn-settings');
+
                 if (activeView?.id === viewId) return;
+
+                settingsBtn.style.display = (viewId === 'main-menu') ? 'flex' : 'none';
+
+                if (viewId === 'view-map') {
+                    document.body.classList.add('map-is-active');
+                    header.style.display = 'none';
+                } else {
+                    document.body.classList.remove('map-is-active');
+                    header.style.display = 'flex';
+                }
 
                 if (activeView) {
                     activeView.classList.add('contracting');
@@ -228,13 +326,15 @@
                         const newView = getEl(viewId);
                         if (newView) {
                             newView.classList.add('active');
-                            backButton.classList.toggle('visible', newView.id !== 'main-menu');
+                            backButtonHotspot.classList.toggle('visible', newView.id !== 'main-menu');
                         }
                     }, animationDuration);
                 } else {
                     const newView = getEl(viewId);
-                    if (newView) newView.classList.add('active');
-                    backButton.classList.toggle('visible', viewId !== 'main-menu');
+                    if (newView) {
+                        newView.classList.add('active');
+                    }
+                    backButtonHotspot.classList.toggle('visible', viewId !== 'main-menu');
                 }
             }
 
@@ -242,7 +342,7 @@
                 dailyTasks: [{ name: 'Do commission', completed: false, streak: 0 }, { name: 'Do event (if any)', completed: false, streak: 0, isEvent: true }, { name: 'Artifacts fodder farming route', completed: false, streak: 0 }, { name: 'Use all my resin', completed: false, streak: 0 }, { name: 'Do battlepass', completed: false, streak: 0 }, { name: 'Explore/Chests for 30 mins', completed: false, streak: 0 }, { name: 'World quests for friendship', completed: false, streak: 0 }],
                 weeklyTasks: [{ name: 'Reputation Commissions', completed: false, streak: 0 }, { name: 'Weekly Bosses', completed: false, streak: 0 }],
                 primogemCount: 0, primogemGoal: 16000, dailyStreak: 0, dailyResetsSinceWeekly: 0, lastDailyReset: new Date().toISOString(), 
-                gachaLog: null, calendarDisplayYear: new Date().getFullYear()
+                gachaLog: null, calendarDisplayYear: new Date().getFullYear(), customDate: null
             });
 
             const loadState = () => {
@@ -256,7 +356,7 @@
             };
             const saveState = () => localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 
-            function renderAll() { renderTasks(); renderPrimos(); renderGachaStats(); renderCalendar(); }
+            function renderAll() { renderTasks(); renderPrimos(); renderGachaStats(); renderCalendar(); renderSettings(); }
             
             function renderTasks() {
                 const renderList = (listEl, data, type) => {
@@ -357,15 +457,19 @@
             }
 
             function renderCalendar() {
+                const calendarGrid = getEl('calendar-grid');
+                if (!calendarGrid) return;
                 const year = state.calendarDisplayYear;
                 getEl('current-year-display').textContent = year;
-                getEl('next-year-btn').disabled = year >= new Date().getFullYear();
-                const calendarGrid = getEl('calendar-grid');
+                getEl('next-year-btn').disabled = year >= getAppDate().getFullYear();
+
                 if (!state.gachaLog?.wishes) { calendarGrid.innerHTML = `<p style="text-align: center; grid-column: 1 / -1;">Import gacha log to see calendar.</p>`; return; }
+                
                 const wishesForYear = state.gachaLog.wishes.filter(w => new Date(w.time).getFullYear() === year);
                 const pullsByDay = wishesForYear.reduce((acc, wish) => { const dayKey = wish.time.split(' ')[0]; acc[dayKey] = (acc[dayKey] || 0) + 1; return acc; }, {});
-                const todayKey = new Date().toISOString().slice(0, 10);
+                const todayKey = toLocalISOString(getAppDate());
                 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                
                 calendarGrid.innerHTML = monthNames.map((name, month) => {
                     const firstDay = new Date(year, month, 1).getDay();
                     const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -383,20 +487,45 @@
                 calendarGrid.querySelectorAll('.has-pulls').forEach(cell => cell.addEventListener('click', () => showDailyBreakdown(cell.dataset.date)));
             }
             
+            function renderSettings() {
+                const display = getEl('custom-date-display');
+                const syncBtn = getEl('sync-date-btn');
+                if (state.customDate) {
+                    display.textContent = `Using custom date: ${state.customDate}`;
+                    syncBtn.style.display = 'block';
+                } else {
+                    display.textContent = 'Using real system time.';
+                    syncBtn.style.display = 'none';
+                }
+            }
+
             async function showModal(options) {
                 const modal = getEl('custom-modal'), modalTitle = getEl('modal-title'), modalMessage = getEl('modal-message'), modalInput = getEl('modal-input'), modalCustom = getEl('modal-custom-content'), modalCancelBtn = getEl('modal-cancel-btn'), modalConfirmBtn = getEl('modal-confirm-btn');
+                
+                modalTitle.textContent = options.title || '';
+                modalMessage.style.display = options.message ? 'block' : 'none';
+                modalMessage.innerHTML = options.message || '';
+                
+                modalCustom.innerHTML = options.customHtml || '';
+                modalCustom.style.display = options.customHtml ? 'block' : 'none';
+
+                modalInput.style.display = options.type === 'prompt' ? 'block' : 'none';
+                if (options.type === 'prompt') {
+                    modalInput.value = options.defaultValue || '';
+                    modalInput.placeholder = options.placeholder || '';
+                }
+
+                modalCancelBtn.style.display = (options.type === 'alert') ? 'none' : 'flex';
+                modalConfirmBtn.textContent = options.confirmText || 'Confirm';
+
+                modal.classList.add('visible');
+                if (options.type === 'prompt') modalInput.focus();
+                
                 return new Promise((resolve) => {
-                    modalTitle.textContent = options.title;
-                    modalMessage.style.display = options.message ? 'block' : 'none'; modalMessage.textContent = options.message || '';
-                    modalInput.style.display = options.type === 'prompt' ? 'block' : 'none';
-                    modalInput.value = options.defaultValue || ''; modalInput.placeholder = options.placeholder || '';
-                    modalCancelBtn.style.display = options.type === 'alert' || options.customHtml ? 'none' : 'flex';
-                    modalConfirmBtn.textContent = options.confirmText || 'Confirm';
-                    modalCustom.style.display = options.customHtml ? 'block' : 'none';
-                    if(options.customHtml) modalCustom.innerHTML = options.customHtml;
-                    modal.classList.add('visible');
-                    if (options.type === 'prompt') modalInput.focus();
-                    const hideAndResolve = (value) => { modal.classList.remove('visible'); resolve(value); };
+                    const hideAndResolve = (value) => {
+                        modal.classList.remove('visible');
+                        setTimeout(() => resolve(value), 50); 
+                    };
                     modalConfirmBtn.onclick = () => hideAndResolve(options.type === 'prompt' ? modalInput.value : true);
                     modalCancelBtn.onclick = () => hideAndResolve(false);
                 });
@@ -465,19 +594,19 @@
                 if(wasPerfectDay) state.dailyStreak++; else state.dailyStreak = 0;
                 state.dailyTasks.forEach(task => { task.streak = task.completed ? task.streak + 1 : 0; task.completed = false; });
                 state.dailyResetsSinceWeekly = (state.dailyResetsSinceWeekly + 1) % 7;
-                state.lastDailyReset = new Date().toISOString();
+                state.lastDailyReset = getAppDate().toISOString();
                 if (state.dailyResetsSinceWeekly === 0) {
                     state.weeklyTasks.forEach(task => { task.streak = task.completed ? task.streak + 1 : 0; task.completed = false; });
                 }
                 saveState(); renderAll();
                 if(!isAuto) await showModal({type:'alert', title:'Reset Complete', message:'Daily and weekly tasks have been reset.', confirmText:'OK'});
             }
-            const checkForAutomaticResets = async () => { if (new Date().toDateString() !== new Date(state.lastDailyReset).toDateString()) await performDailyReset(true); };
+            const checkForAutomaticResets = async () => { if (getAppDate().toDateString() !== new Date(state.lastDailyReset).toDateString()) await performDailyReset(true); };
             
             async function handleGachaImport(url) {
                 getEl('gacha-stats-container').innerHTML = `<p style="text-align:center; padding: 20px;">Importing... this may take a moment.</p>`;
                 const CORS_PROXY = 'https://corsproxy.io/?';
-                const bannerTypes = [{ id: '301', name: 'Character Event' }, { id: '302', name: 'Weapon Event' }, { id: '200', name: 'Standard' }, { id: '100', name: 'Novice'}];
+                const bannerTypes = [{ id: '301', name: 'Character Event' }, { id: '302', name: 'Weapon Event' }, { id: '200', 'name': 'Standard' }, { id: '100', name: 'Novice'}];
                 let allWishes = state.gachaLog?.wishes || [];
                 const existingWishIds = new Set(allWishes.map(w => w.id));
                 try {
@@ -509,7 +638,7 @@
             }
 
             function bindEventListeners() {
-                document.querySelectorAll('.menu-button').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
+                document.querySelectorAll('.menu-button, #menu-btn-settings').forEach(b => b.addEventListener('click', () => showView(b.dataset.view)));
                 getEl('btn-back-main').addEventListener('click', () => showView('main-menu'));
                 setInterval(() => getEl('live-clock').textContent = new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit' }), 1000);
                 
@@ -541,16 +670,41 @@
                     }
                 });
 
+                getEl('set-date-btn').addEventListener('click', async () => {
+                    const confirmed = await showModal({
+                        title: 'Set Custom Date',
+                        customHtml: `<p style="margin-top:0; margin-bottom: 15px;">Select a date. The app will use this for daily checks.</p><input type="date" id="custom-date-input-modal" class="modal-input" style="display:block;" value="${state.customDate || toLocalISOString(getAppDate())}">`,
+                        confirmText: 'Set Date'
+                    });
+
+                    if (confirmed) {
+                        const newDate = getEl('custom-date-input-modal').value;
+                        if(newDate) {
+                            state.customDate = newDate;
+                            saveState();
+                            renderAll();
+                            checkForAutomaticResets();
+                        }
+                    }
+                });
+
+                getEl('sync-date-btn').addEventListener('click', () => {
+                    state.customDate = null;
+                    saveState();
+                    renderAll();
+                });
+
                 getEl('reset-all-btn').addEventListener('click', async () => { if(await showModal({title:'Confirm Total Reset', message:'This will delete all saved data. This cannot be undone.', type:'confirm'})){localStorage.removeItem(STORAGE_KEY); location.reload();} });
                 
                 getEl('prev-year-btn').addEventListener('click', () => { state.calendarDisplayYear--; renderCalendar(); saveState(); });
-                getEl('next-year-btn').addEventListener('click', () => { if (state.calendarDisplayYear < new Date().getFullYear()) { state.calendarDisplayYear++; renderCalendar(); saveState(); } });
+                getEl('next-year-btn').addEventListener('click', () => { if (state.calendarDisplayYear < getAppDate().getFullYear()) { state.calendarDisplayYear++; renderCalendar(); saveState(); } });
             }
 
             setViewHTML();
             loadState();
             checkForAutomaticResets();
             bindEventListeners();
+            showView('main-menu');
             renderAll();
             saveState();
         });
